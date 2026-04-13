@@ -2,8 +2,9 @@ export interface Post {
   id: number;
   title: string;
   content: string;
-  author: string;
-  date: string;
+  author?: string;
+  date?: string;
+  body?: string; // For JSONPlaceholder compatibility
 }
 
 export const posts: Post[] = [

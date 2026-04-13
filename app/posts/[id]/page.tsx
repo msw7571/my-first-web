@@ -1,14 +1,33 @@
 import Link from "next/link";
-import { posts } from "@/lib/posts";
+import { posts, Post } from "@/lib/posts";
 import { notFound } from "next/navigation";
 
 interface PostPageProps {
   params: Promise<{ id: string }>;
 }
 
+async function getPost(id: string): Promise<Post | null> {
+  // First check static posts
+  const staticPost = posts.find((p) => p.id === Number(id));
+  if (staticPost) return staticPost;
+
+  // Then try JSONPlaceholder (id 1-100)
+  const idNum = Number(id);
+  if (idNum > 0 && idNum <= 100) {
+    try {
+      const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`);
+      if (res.ok) return res.json();
+    } catch (e) {
+      console.error("Fetch error:", e);
+    }
+  }
+
+  return null;
+}
+
 export default async function PostPage({ params }: PostPageProps) {
   const { id } = await params;
-  const post = posts.find((p) => p.id === Number(id));
+  const post = await getPost(id);
 
   if (!post) {
     return (
@@ -25,6 +44,8 @@ export default async function PostPage({ params }: PostPageProps) {
     );
   }
 
+  const content = post.content || post.body || "";
+
   return (
     <article className="max-w-2xl mx-auto py-10">
       <header className="mb-10 text-center">
@@ -36,18 +57,18 @@ export default async function PostPage({ params }: PostPageProps) {
             ← 목록으로 돌아가기
           </Link>
         </div>
-        <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-4">
+        <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-4 px-4">
           {post.title}
         </h1>
         <div className="flex items-center justify-center gap-4 text-sm text-gray-500">
-          <span className="font-medium text-gray-900">{post.author}</span>
+          <span className="font-medium text-gray-900">{post.author || "JSONPlaceholder User"}</span>
           <span>•</span>
-          <time>{post.date}</time>
+          <time>{post.date || "2026-04-13"}</time>
         </div>
-      </header>
+      </header> 
 
-      <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
-        {post.content.split('\n').map((line, index) => (
+      <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed bg-white p-8 rounded-2xl border border-gray-100 shadow-sm mx-4">
+        {content.split('\n').map((line, index) => (
           <p key={index} className="mb-4">
             {line}
           </p>
