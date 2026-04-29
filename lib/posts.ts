@@ -4,6 +4,7 @@ export interface Post {
   content: string;
   author?: string;
   date?: string;
+  created_at?: string;
   body?: string; // For JSONPlaceholder compatibility
 }
 

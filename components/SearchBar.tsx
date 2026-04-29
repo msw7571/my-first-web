@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Input } from "@/components/ui/input";
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
@@ -17,12 +18,12 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
 
   return (
     <div className="relative mb-8">
-      <input
+      <Input
         type="text"
         value={query}
         onChange={handleChange}
         placeholder="게시글 제목을 검색하세요..."
-        className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-800 transition-all shadow-sm"
+        className="w-full pl-4 pr-10 py-6 text-base bg-white border-gray-200 rounded-xl focus-visible:ring-gray-800 shadow-sm"
       />
       <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
         <svg
