@@ -1,38 +1,4 @@
 "use server";
 
-import { supabase } from "@/lib/supabase";
-import { revalidatePath } from "next/cache";
-
-export async function createPostAction(formData: FormData) {
-  const title = formData.get("title") as string;
-  const content = formData.get("content") as string;
-  
-  if (!title || !content) return { error: "Title and content are required" };
-
-  const { error } = await supabase
-    .from("posts")
-    .insert([{ title, content, author: "익명" }]);
-
-  if (error) {
-    console.error("Failed to create post:", error);
-    return { error: error.message };
-  }
-
-  revalidatePath("/posts");
-  return { success: true };
-}
-
-export async function deletePostAction(id: number) {
-  const { error } = await supabase
-    .from("posts")
-    .delete()
-    .eq("id", id);
-
-  if (error) {
-    console.error("Failed to delete post:", error);
-    return { error: error.message };
-  }
-
-  revalidatePath("/posts");
-  return { success: true };
-}
+// Note: Ch10 마이그레이션으로 인해 게시글 CRUD는 클라이언트 컴포넌트(lib/supabase/client)와 useAuth 기반으로 변경되었습니다.
+// 만약 다른 Server Actions가 필요하다면 이 파일에 추가하세요.

@@ -60,18 +60,29 @@ UI의 일관성과 높은 사용성을 보장하기 위해 `shadcn/ui` 컴포넌
 Supabase (PostgreSQL) 기반의 관계형 데이터베이스 모델로 구성되어 있습니다. 향후 로그인 체계와 결합될 구조를 반영합니다.
 
 ### 테이블 관계
-블로그 사용자(`users`)와 게시글(`posts`)은 **1:N (일대다) 관계**를 형성합니다. 즉, 한 명의 사용자가 여러 개의 게시글을 작성할 수 있습니다.
+블로그 사용자 프로필(`profiles`)과 게시글(`posts`)은 **1:N (일대다) 관계**를 형성합니다. 즉, 한 명의 사용자가 여러 개의 게시글을 작성할 수 있습니다.
 
 ### `posts` 테이블
 사용자가 작성한 게시글 데이터를 저장합니다.
-- `id` (bigint) : 게시글의 고유 식별자 (Primary Key, 자동 증가)
+- `id` (uuid) : 게시글의 고유 식별자 (Primary Key)
+- `user_id` (uuid) : 글을 작성한 사용자의 식별자 (Foreign Key → `profiles.id` 참조)
 - `title` (text) : 게시글 제목 (Not Null)
 - `content` (text) : 게시글 본문 내용 (Not Null)
-- `author_id` (uuid) : 글을 작성한 사용자의 고유 식별자 (Foreign Key → `users.id` 참조, 현재는 텍스트 기반 `author` 컬럼 혼용 중)
-- `created_at` (timestamptz) : 글이 작성된 시각 (기본값: now())
+- `created_at` (timestamptz) : 글이 작성된 시각
 
-### `users` 테이블 (Supabase Auth 연동)
-Supabase에서 제공하는 내장 인증 스키마(`auth.users`)를 기반으로 회원 정보를 관리합니다.
-- `id` (uuid) : 사용자 고유 식별자 (Primary Key)
-- `email` (varchar) : 로그인에 사용되는 이메일 주소 (Unique)
-- `created_at` (timestamptz) : 계정 생성 시각
+### `profiles` 테이블
+Supabase Auth(`auth.users`)와 연결된 사용자 프로필 정보를 관리합니다.
+- `id` (uuid) : 프로필 고유 식별자 (Primary Key, `auth.users(id)` 참조)
+- `username` (text) : 사용자 이름 또는 닉네임
+- `avatar_url` (text) : 프로필 이미지 URL
+- `role` (text) : 사용자 역할 정보
+
+---
+
+## 6. 인증 및 데이터 연동 (Auth & Data Flow)
+Ch10 기준으로 게시글 CRUD는 다음 규칙을 따릅니다.
+
+- **데이터베이스 접근**: `lib/supabase/client.ts`에 정의된 Supabase 클라이언트를 단일 진입점으로 사용합니다.
+- **사용자 인증**: Ch9에서 구현한 `useAuth` 훅과 `AuthProvider` 컨텍스트를 통해 현재 로그인한 사용자 정보에 접근합니다.
+- **게시글 작성**: 새 글 작성 시 `useAuth`에서 가져온 유저 정보를 바탕으로 `user_id`를 할당합니다.
+- **권한 처리 (UX)**: 본인이 작성한 게시글에서만 수정/삭제 버튼이 보이도록 프론트엔드 단에서 제어합니다. 실제 데이터 접근 보안은 이후 단계(Ch11 RLS)에서 데이터베이스 레벨로 통제됩니다.

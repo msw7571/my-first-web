@@ -8,10 +8,10 @@
 ## Version Policy
 
 - 교재 기준: Next.js 16.2.1, @supabase/supabase-js 2.47.12, @supabase/ssr 0.5.2
-- 현재 설치 기준: @supabase/supabase-js ^2.105.1, @supabase/ssr ^0.10.2
-- 실제 package.json이 더 최신일 수 있다.
+- 현재 설치 기준: Next.js 16.2.1, @supabase/supabase-js ^2.105.1, @supabase/ssr ^0.10.2
+- 실제 package.json이 교재 기준보다 최신이므로, 이를 삭제하지 않고 유지한다.
 - 수업 프롬프트와 설명은 교재 기준으로 통일한다.
-- 빌드 오류가 버전 차이에서 발생하면 package.json 기준으로 원인을 확인한다.
+- 빌드 오류가 버전 차이에서 발생하면 package.json (현재 설치 기준)을 바탕으로 원인을 확인한다.
 
 ## Supabase Auth Rules (Ch9)
 
@@ -20,6 +20,16 @@
 - 보호 라우트 파일로 `middleware.ts`를 사용한다.
 - Supabase Auth 로그인은 `signInWithPassword`를 사용한다. 구버전 `auth.signIn()`은 사용하지 않는다.
 - `service_role` 키는 클라이언트에 절대 두지 않는다.
+
+## Post CRUD Rules (Ch10)
+
+- Ch7·Ch8 교재 기준 패키지를 따른다.
+- 데이터베이스 접근 시 Ch8의 `lib/supabase/client.ts`를 사용한다.
+- 로그인한 사용자 정보는 Ch9의 `useAuth` / `AuthProvider`를 사용해 가져온다.
+- `posts` 테이블의 컬럼명은 Ch8 스키마를 그대로 사용한다 (id, user_id, title, content, created_at).
+- `posts` 테이블의 id는 uuid이며, user_id는 profiles 테이블을 참조한다.
+- App Router만 사용하며, `next/router` 사용은 엄격히 금지한다.
+- 게시글 수정/삭제 UI 노출 여부는 프론트엔드 UX 차원에서의 처리이며, 실제 보안 및 권한 검증은 Ch11 RLS(Row Level Security)에서 처리한다.
 
 ## Coding Conventions
 

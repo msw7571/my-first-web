@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { posts, Post } from "@/lib/posts";
+import { Post } from "@/lib/posts";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import PostActionButtons from "@/components/PostActionButtons";
 
 interface PostPageProps {
   params: Promise<{ id: string }>;
@@ -29,18 +30,10 @@ export default async function PostPage({ params }: PostPageProps) {
   const post = await getPost(id);
 
   if (!post) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">게시글을 찾을 수 없습니다</h2>
-        <p className="text-gray-500 mb-8">요청하신 게시글이 존재하지 않거나 삭제되었을 수 있습니다.</p>
-        <Button variant="default" asChild>
-          <Link href="/posts">목록으로 돌아가기</Link>
-        </Button>
-      </div>
-    );
+    notFound();
   }
 
-  const content = post.content || post.body || "";
+  const content = post.content || "";
 
   return (
     <article className="max-w-2xl mx-auto py-10">
@@ -56,9 +49,9 @@ export default async function PostPage({ params }: PostPageProps) {
           {post.title}
         </h1>
         <div className="flex items-center justify-center gap-4 text-sm text-gray-500">
-          <span className="font-medium text-gray-900">{post.author || "JSONPlaceholder User"}</span>
+          <span className="font-medium text-gray-900">작성자: {post.user_id ? post.user_id.slice(0, 8) : "익명"}</span>
           <span>•</span>
-          <time>{post.created_at ? new Date(post.created_at).toISOString().split('T')[0] : (post.date || "2026-04-13")}</time>
+          <time>{post.created_at ? new Date(post.created_at).toISOString().split('T')[0] : ""}</time>
         </div>
       </header> 
 
@@ -69,6 +62,8 @@ export default async function PostPage({ params }: PostPageProps) {
           </p>
         ))}
       </div>
+
+      <PostActionButtons post={post} />
 
       <footer className="mt-12 pt-8 border-t border-gray-100">
         <div className="flex justify-center">
