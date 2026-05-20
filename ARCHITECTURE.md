@@ -80,9 +80,26 @@ Supabase Auth(`auth.users`)와 연결된 사용자 프로필 정보를 관리합
 ---
 
 ## 6. 인증 및 데이터 연동 (Auth & Data Flow)
-Ch10 기준으로 게시글 CRUD는 다음 규칙을 따릅니다.
+Ch11 기준으로 게시글 CRUD 및 보안은 다음 규칙을 따릅니다.
 
 - **데이터베이스 접근**: `lib/supabase/client.ts`에 정의된 Supabase 클라이언트를 단일 진입점으로 사용합니다.
 - **사용자 인증**: Ch9에서 구현한 `useAuth` 훅과 `AuthProvider` 컨텍스트를 통해 현재 로그인한 사용자 정보에 접근합니다.
 - **게시글 작성**: 새 글 작성 시 `useAuth`에서 가져온 유저 정보를 바탕으로 `user_id`를 할당합니다.
-- **권한 처리 (UX)**: 본인이 작성한 게시글에서만 수정/삭제 버튼이 보이도록 프론트엔드 단에서 제어합니다. 실제 데이터 접근 보안은 이후 단계(Ch11 RLS)에서 데이터베이스 레벨로 통제됩니다.
+- **RLS 적용 대상**: `posts` 테이블과 `profiles` 테이블을 우선 대상으로 삼아 Row Level Security를 적용합니다.
+- **보안 및 권한 처리**:
+  - **프론트엔드 UX 제어**: 수정/삭제 버튼 노출 여부는 본인이 작성한 게시글인지 확인하여 조건부 렌더링을 진행합니다.
+  - **보안 계층 분리**: UI 분기는 사용자 경험(UX)을 위한 분기이며, 실질적인 보안은 데이터베이스 레벨의 RLS가 담당합니다.
+  - **백엔드/데이터베이스 보안 (RLS)**: 클라이언트 UI 분기는 완벽한 보안책이 될 수 없으므로, Supabase **RLS (Row Level Security)** 정책을 적용하여 실제 데이터베이스 레벨에서 침입 및 권한 없는 변조를 완벽히 통제합니다.
+  - **RLS 마이그레이션 관리**: RLS 정책은 Supabase Dashboard SQL Editor에서 수동으로 실행하지 않고, **Supabase CLI 마이그레이션 파일**로 저장하고 기록하여 형상 관리를 보장합니다.
+  - **정책 규칙**:
+    - `posts` 테이블의 SELECT 정책은 모든 사용자에게 개방(True)합니다.
+    - `posts` 테이블의 INSERT 정책은 로그인된 사용자만 가능하며, `auth.uid() = user_id` 조건이 성립해야 합니다.
+    - `posts` 테이블의 UPDATE, DELETE 정책은 `auth.uid() = user_id` 조건이 성립하는 작성자 본인 레코드만 가능하도록 제한합니다.
+    - `profiles` 테이블의 SELECT 정책은 전체 공개하며, INSERT 및 UPDATE는 `auth.uid() = id` 인 본인 프로필만 수정 가능하도록 제한합니다.
+  - **보안 수칙**: 클라이언트 단에서 무제한 권한을 가진 `service_role` API 키를 유출하거나 사용하지 않고, 익명 키(`anon_key`) 환경 하에 RLS로 각 사용자의 데이터 소유권을 보호합니다.
+  - **보호 정책 목록**:
+    - `posts_select_public` : SELECT, 모든 사용자 허용
+    - `posts_insert_owner` : INSERT, `auth.uid() = user_id` 확인
+    - `posts_update_owner` : UPDATE, `auth.uid() = user_id` 확인 및 수정 후에도 동일 여부 확인
+    - `posts_delete_owner` : DELETE, `auth.uid() = user_id` 확인
+

@@ -10,7 +10,7 @@ export async function signInWithEmail(email: string, password: string) {
 
 export async function signUpWithEmail(email: string, password: string, name: string) {
   const supabase = createClient();
-  return await supabase.auth.signUp({
+  const result = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -19,6 +19,23 @@ export async function signUpWithEmail(email: string, password: string, name: str
       },
     },
   });
+
+  if (result.data?.user) {
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .insert([
+        {
+          id: result.data.user.id,
+          username: name,
+          role: 'user'
+        }
+      ]);
+    if (profileError) {
+      console.error("Error creating profile during signup:", profileError);
+    }
+  }
+
+  return result;
 }
 
 export async function signOut() {

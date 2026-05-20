@@ -27,6 +27,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         setUser(user);
+        if (user) {
+          // Ensure profile exists on the fly
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("id")
+            .eq("id", user.id)
+            .maybeSingle();
+
+          if (!profile) {
+            await supabase.from("profiles").insert([
+              {
+                id: user.id,
+                username: user.user_metadata?.name || user.email?.split("@")[0] || "사용자",
+                role: "user"
+              }
+            ]);
+          }
+        }
       } catch (error) {
         console.error("Error fetching user:", error);
       } finally {
@@ -39,9 +57,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // 로그인/로그아웃 등 상태 변화 감지
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
       setLoading(false);
+
+      if (currentUser) {
+        // Ensure profile exists on the fly
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("id", currentUser.id)
+          .maybeSingle();
+
+        if (!profile) {
+          await supabase.from("profiles").insert([
+            {
+              id: currentUser.id,
+              username: currentUser.user_metadata?.name || currentUser.email?.split("@")[0] || "사용자",
+              role: "user"
+            }
+          ]);
+        }
+      }
     });
 
     // cleanup 함수에서 반드시 구독 해제

@@ -31,6 +31,16 @@
 - App Router만 사용하며, `next/router` 사용은 엄격히 금지한다.
 - 게시글 수정/삭제 UI 노출 여부는 프론트엔드 UX 차원에서의 처리이며, 실제 보안 및 권한 검증은 Ch11 RLS(Row Level Security)에서 처리한다.
 
+## Supabase RLS Rules (Ch11)
+
+- RLS는 SQL Editor 직접 실행이 아니라 Supabase CLI 마이그레이션으로 남긴다. (`supabase/migrations` 디렉토리 내에 버전이 지정된 sql 파일 생성)
+- `posts` 테이블의 `user_id`와 `auth.uid()`를 기준으로 정책을 만든다.
+- 보안은 클라이언트 if문으로만 처리해서는 안 되며, 실제 권한 검증은 RLS로 강제해야 한다.
+- `posts` 테이블 RLS SQL은 마이그레이션 파일로 남기고 코드 내에 하드코딩하지 않는다.
+- 클라이언트 UI 분기(본인 확인 후 수정/삭제 버튼 노출 등)는 프론트엔드 UX/DX 개선용일 뿐 보안이 아니며, 실제 데이터 보호 및 보안 검증은 데이터베이스 레벨의 RLS가 담당한다.
+- `service_role` 키는 클라이언트(브라우저)에서 절대 사용하지 않으며, 오직 안전한 서버 환경(서버 컴포넌트, Route Handler 등)에서만 필요한 경우에 한해 엄격히 사용한다. (클라이언트 단에 노출 절대 금지)
+
+
 ## Coding Conventions
 
 - Default to Server Components unless a Client Component is required.
