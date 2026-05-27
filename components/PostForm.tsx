@@ -18,12 +18,35 @@ export default function PostForm({ initialData }: PostFormProps) {
   const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState(initialData?.title || "");
   const [content, setContent] = useState(initialData?.content || "");
+  const [titleError, setTitleError] = useState("");
+  const [contentError, setContentError] = useState("");
+  const [formError, setFormError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setTitleError("");
+    setContentError("");
+    setFormError("");
+
     if (!user) {
-      alert("로그인이 필요합니다.");
+      setFormError("로그인이 필요합니다.");
       router.push("/login");
+      return;
+    }
+
+    let hasError = false;
+
+    if (title.trim().length < 2) {
+      setTitleError("제목은 최소 2자 이상이어야 합니다.");
+      hasError = true;
+    }
+
+    if (content.trim().length < 10) {
+      setContentError("내용은 최소 10자 이상이어야 합니다.");
+      hasError = true;
+    }
+
+    if (hasError) {
       return;
     }
 
@@ -32,40 +55,29 @@ export default function PostForm({ initialData }: PostFormProps) {
 
     try {
       if (initialData) {
-        // Update
         const { error } = await supabase
           .from("posts")
           .update({ title, content })
           .eq("id", initialData.id)
-          // 주의: 이 조건은 프론트엔드 차원의 최소한의 필터링일 뿐입니다.
-          // 실제 보안 및 권한 검증은 추후 Ch11 RLS(Row Level Security)에서 데이터베이스 레벨로 처리됩니다.
-          .eq("user_id", user.id); 
+          .eq("user_id", user.id);
 
         if (error) throw error;
-        alert("게시글이 수정되었습니다.");
         router.push(`/posts/${initialData.id}`);
       } else {
-        // Create
         const { data, error } = await supabase
           .from("posts")
-          .insert([
-            { title, content, user_id: user.id }
-          ])
+          .insert([{ title, content, user_id: user.id }])
           .select()
           .single();
 
         if (error) throw error;
-        alert("게시글이 작성되었습니다.");
-        if (data) {
-          router.push(`/posts/${data.id}`);
-        } else {
-          router.push("/posts");
-        }
+        router.push(data ? `/posts/${data.id}` : "/posts");
       }
+
       router.refresh();
     } catch (error: any) {
       console.error("Error saving post:", error);
-      alert(error.message || "게시글 저장에 실패했습니다.");
+      setFormError(error?.message || "게시글 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.");
     } finally {
       setLoading(false);
     }
@@ -83,7 +95,11 @@ export default function PostForm({ initialData }: PostFormProps) {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           className="w-full bg-background"
+          disabled={loading}
         />
+        {titleError ? (
+          <p className="mt-2 text-sm text-destructive">{titleError}</p>
+        ) : null}
       </div>
       <div>
         <label htmlFor="content" className="block text-sm font-medium mb-2 text-foreground">내용</label>
@@ -95,8 +111,19 @@ export default function PostForm({ initialData }: PostFormProps) {
           value={content}
           onChange={(e) => setContent(e.target.value)}
           className="w-full px-4 py-3 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-input transition-all bg-background text-foreground resize-y"
+          disabled={loading}
         />
+        {contentError ? (
+          <p className="mt-2 text-sm text-destructive">{contentError}</p>
+        ) : null}
       </div>
+
+      {formError && (
+        <p className="rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+          {formError}
+        </p>
+      )}
+
       <div className="flex justify-end gap-4 pt-4">
         <Button
           type="button"

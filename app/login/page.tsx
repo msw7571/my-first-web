@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signInWithEmail } from "@/lib/auth";
+import { getErrorMessage } from "@/lib/error-message";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,13 +25,15 @@ export default function LoginPage() {
       const { error } = await signInWithEmail(email, password);
       
       if (error) {
-        setErrorMsg(error.message);
+        console.error("Login error:", error);
+        setErrorMsg(getErrorMessage(error));
       } else {
         router.push("/posts");
         router.refresh(); // 헤더 등의 인증 상태 업데이트를 위해 새로고침
       }
     } catch (err: any) {
-      setErrorMsg(err.message || "로그인 중 예기치 않은 오류가 발생했습니다.");
+      console.error("Login exception:", err);
+      setErrorMsg(getErrorMessage(err));
     } finally {
       setLoading(false);
     }

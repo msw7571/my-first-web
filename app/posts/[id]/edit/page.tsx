@@ -5,14 +5,19 @@ import { Post } from "@/lib/posts";
 
 export default async function EditPostPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  
+
   const { data: post, error } = await supabase
     .from("posts")
     .select("*")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
-  if (error || !post) {
+  if (error) {
+    console.error("Failed to fetch post for edit:", error);
+    throw new Error("게시글을 불러오는 중 오류가 발생했습니다.");
+  }
+
+  if (!post) {
     notFound();
   }
 

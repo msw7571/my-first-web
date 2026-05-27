@@ -29,7 +29,17 @@
   - [x] 다른 계정 우회 테스트
   - [x] 보안 키 노출 grep 확인
   - [x] 빌드/배포 검증
+- [x] 에러 처리 및 로딩 UX 개선
+  - [x] 전체 앱 로딩 경계 `app/loading.tsx` 추가
+  - [x] 전체 앱 에러 경계 `app/error.tsx` 추가
+  - [x] `/posts` 목록 로딩 및 에러 상태 처리
+  - [x] 개별 페이지 로딩 `app/posts/loading.tsx`, `app/posts/[id]/loading.tsx`, `app/posts/[id]/edit/loading.tsx` 추가
+  - [x] 로그인/회원가입 에러 메시지 변환 유틸 `lib/error-message.ts` 적용
+  - [x] 클라이언트 폼 유효성 검증: 제목 2자, 내용 10자, 제출 중 버튼 비활성화
+- [x] Playwright E2E 테스트 작성
+  - [x] `tests/auth-crud.spec.ts` 작성 완료
+  - [ ] Vercel 배포 URL 수동 검증 (확인 필요)
 - [ ] 마이페이지 (Ch12)
 - [ ] 댓글 기능 (Ch12)
 
-## 진행률: 15/18 (Ch11 RLS 보안 완료 수준)
+## 진행률: 16/18 (Ch11 RLS 보안 완료 + Ch12 에러/UX 개선 및 E2E 테스트 진행)

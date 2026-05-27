@@ -103,3 +103,28 @@ Ch11 기준으로 게시글 CRUD 및 보안은 다음 규칙을 따릅니다.
     - `posts_update_owner` : UPDATE, `auth.uid() = user_id` 확인 및 수정 후에도 동일 여부 확인
     - `posts_delete_owner` : DELETE, `auth.uid() = user_id` 확인
 
+## 7. 에러 처리 및 UX 상태 관리
+
+- 전체 앱 공통 로딩/에러 경계
+  - `app/loading.tsx`: 전체 App Router 레벨 로딩 인터셉터
+  - `app/error.tsx`: 전체 앱 오류 발생 시 친절한 안내 화면과 재시도 버튼
+- `/posts` 화면 상태
+  - `app/posts/loading.tsx`: 게시글 목록 페이지 로딩 화면
+  - `app/posts/error.tsx`: 게시글 목록 페이지 오류 안내 화면
+  - `/posts` 목록 페이지는 로딩, 빈 상태, 에러 상태를 모두 처리하도록 구성
+- 게시글 상세 및 수정 페이지 상태
+  - `app/posts/[id]/loading.tsx`: 게시글 상세 로딩 화면
+  - `app/posts/[id]/edit/loading.tsx`: 게시글 수정 페이지 로딩 화면
+- 폼 유효성 규칙
+  - `PostForm`에서 제목은 필수, 최소 2자
+  - `PostForm`에서 내용은 필수, 최소 10자
+  - 제출 중에는 버튼 비활성화하여 중복 제출 방지
+  - 실패 시 해당 입력 아래에 에러 메시지 표시
+- 에러 메시지 변환 규칙
+  - `lib/error-message.ts`를 통해 Supabase/네트워크 오류를 화면용으로 변환
+    - `42501` 또는 `row-level security` → `이 작업을 수행할 권한이 없습니다.`
+    - `Failed to fetch` → `인터넷 연결을 확인해주세요.`
+    - `not found` 계열 → `요청한 게시글을 찾을 수 없습니다.`
+    - 기본값 → `일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.`
+  - 로그인/회원가입 페이지에서 Supabase 오류 원문 대신 변환된 메시지를 사용자에게 표시하고, `console.error`는 개발자 로그로 유지합니다.
+

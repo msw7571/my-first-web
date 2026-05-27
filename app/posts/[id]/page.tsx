@@ -10,16 +10,20 @@ interface PostPageProps {
 
 import { supabase } from "@/lib/supabase";
 
-async function getPost(id: string): Promise<Post | null> {
+async function getPost(id: string): Promise<Post> {
   const { data, error } = await supabase
     .from("posts")
     .select("*")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error("Failed to fetch post from Supabase:", error);
-    return null;
+    throw new Error("게시글을 불러오는 중 오류가 발생했습니다.");
+  }
+
+  if (!data) {
+    notFound();
   }
 
   return data as Post;
@@ -28,10 +32,6 @@ async function getPost(id: string): Promise<Post | null> {
 export default async function PostPage({ params }: PostPageProps) {
   const { id } = await params;
   const post = await getPost(id);
-
-  if (!post) {
-    notFound();
-  }
 
   const content = post.content || "";
 

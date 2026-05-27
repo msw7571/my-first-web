@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signUpWithEmail } from "@/lib/auth";
+import { getErrorMessage } from "@/lib/error-message";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,7 +28,8 @@ export default function SignupPage() {
       const { error } = await signUpWithEmail(email, password, name);
       
       if (error) {
-        setErrorMsg(error.message);
+        console.error("Signup error:", error);
+        setErrorMsg(getErrorMessage(error));
       } else {
         setSuccessMsg("가입이 완료되었습니다. 잠시 후 로그인 화면으로 이동합니다.");
         setTimeout(() => {
@@ -35,7 +37,8 @@ export default function SignupPage() {
         }, 2000);
       }
     } catch (err: any) {
-      setErrorMsg(err.message || "회원가입 중 예기치 않은 오류가 발생했습니다.");
+      console.error("Signup exception:", err);
+      setErrorMsg(getErrorMessage(err));
     } finally {
       setLoading(false);
     }

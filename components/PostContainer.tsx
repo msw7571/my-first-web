@@ -20,7 +20,10 @@ export default function PostContainer({ initialPosts }: PostContainerProps) {
   const { user } = useAuth();
   const router = useRouter();
 
+  const [actionError, setActionError] = useState<string | null>(null);
+
   const handleDeletePost = async (id: string) => {
+    setActionError(null);
     const supabase = createClient();
     const { error } = await supabase
       .from("posts")
@@ -29,9 +32,9 @@ export default function PostContainer({ initialPosts }: PostContainerProps) {
       .eq("user_id", user?.id);
 
     if (error) {
-      alert("삭제 중 오류가 발생했습니다: " + error.message);
+      console.error("게시글 삭제 오류:", error);
+      setActionError("게시글 삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.");
     } else {
-      alert("게시글이 삭제되었습니다.");
       router.refresh();
     }
   };
@@ -50,6 +53,12 @@ export default function PostContainer({ initialPosts }: PostContainerProps) {
           <Link href="/posts/new">새 글 작성하기</Link>
         </Button>
       </div>
+
+      {actionError && (
+        <div className="rounded-3xl border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
+          {actionError}
+        </div>
+      )}
 
       <h2 className="text-2xl font-bold mb-6 text-foreground">게시글 목록</h2>
       

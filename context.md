@@ -42,9 +42,30 @@
   - **해결**:
     1. `lib/auth.ts`의 `signUpWithEmail`에서 회원가입 시 `profiles` 테이블에 프로필 레코드가 자동으로 생성되도록 보완했습니다.
     2. 기존에 가입했거나 프로필이 유실된 유저들을 위해, `contexts/AuthContext.tsx`에서 인증 세션을 로드할 때 프로필 존재 여부를 확인하고 없으면 온더플라이(on-the-fly)로 생성하도록 안전장치를 마련했습니다.
+- Ch12 에러/UX 개선
+  - `app/error.tsx`, `app/loading.tsx`, `app/posts/error.tsx`, `app/posts/loading.tsx`, `app/posts/[id]/loading.tsx`, `app/posts/[id]/edit/loading.tsx` 파일을 추가하여 전체/개별 페이지 로딩 및 에러 경계를 구성했습니다.
+  - `/posts` 목록 페이지에서 로딩, 빈 상태, 에러 상태를 모두 처리하도록 업데이트했습니다.
+  - `PostForm`에 제목 2자 이상, 내용 10자 이상 클라이언트 유효성 검사를 적용하고 제출 중에는 버튼 비활성화했습니다.
+  - `lib/error-message.ts`에 Supabase/네트워크 오류 메시지를 사용자 친화적으로 변환하는 로직을 추가했습니다.
 
 ## 알게 된 점
 
 - Tailwind CSS 4 기준에서는 `@import "tailwindcss"` + `@theme` 블록으로 설정 (`tailwind.config.js` 불필요)
 - Server Component에서 useRouter 사용 불가 → `next/navigation`의 redirect() 사용
 - 교재 패키지 버전(Supabase-js 2.47.12)과 현재 설치 버전(^2.105.1)에 차이가 있으나, 현재 설치된 최신 버전을 유지하면서 코드는 교재 기준으로 작성함.
+
+## 최종 검증 보고서
+
+- 테스트 환경:
+  - 로컬: `npx playwright test` 실행 확인, 현재 테스트 환경은 로컬 개발 환경 기준입니다.
+  - Vercel: `vercel env ls`는 실행되었으나, 실제 배포 URL 및 프로덕션 검증은 현재 워크스페이스에서 수집되지 않았습니다. (확인 필요)
+- Playwright 테스트 결과:
+  - `tests/auth-crud.spec.ts` 작성 완료.
+  - 로그인 후 `/posts/new`에서 게시글 작성 및 `/posts` 목록 확인 시나리오가 포함되어 있습니다.
+  - 비인증 사용자의 `/posts/new` 접근 시 `/login`으로 리다이렉트되는 시나리오가 포함되어 있습니다.
+- 배포 URL 수동 검증 결과:
+  - 현재 배포 URL에 대한 실질적 접근 및 UI 검증은 수행되지 않았습니다. (확인 필요)
+- 확인 필요:
+  - Vercel 배포 성공 여부 및 production 환경에서의 라우트 보호 검증.
+  - `profiles` 테이블에 대한 RLS 적용 여부와 회원가입 시 `profiles` 생성 실패 시나리오.
+  - `/posts/[id]/edit` 경로에 대한 서버 차원의 보호 여부.
