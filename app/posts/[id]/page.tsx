@@ -3,6 +3,8 @@ import { Post } from "@/lib/posts";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import PostActionButtons from "@/components/PostActionButtons";
+import CommentsSection from "@/components/CommentsSection";
+import LikeButton from "@/components/LikeButton";
 
 interface PostPageProps {
   params: Promise<{ id: string }>;
@@ -62,6 +64,12 @@ export default async function PostPage({ params }: PostPageProps) {
           </p>
         ))}
       </div>
+
+      <div className="mt-8">
+        <LikeButton postId={post.id} />
+      </div>
+
+      <CommentsSection postId={post.id} />
 
       <PostActionButtons post={post} />
 

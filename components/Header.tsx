@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import DarkModeToggle from "@/components/DarkModeToggle";
 
 export default function Header() {
   const { user, loading, signOut } = useAuth();
@@ -26,6 +27,8 @@ export default function Header() {
         </Link>
         
         <div className="flex items-center space-x-4">
+          <DarkModeToggle />
+
           {loading ? (
             <span className="text-sm text-gray-400">상태 확인 중...</span>
           ) : user ? (

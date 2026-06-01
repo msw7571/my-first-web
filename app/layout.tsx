@@ -20,6 +20,25 @@ export default function RootLayout({
   return (
     <html lang="ko" className={cn("font-sans", geist.variable)}>
       <body className="antialiased">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = window.localStorage.getItem('theme');
+                  if (theme === 'dark' || theme === 'light') {
+                    document.documentElement.classList.toggle('dark', theme === 'dark');
+                    return;
+                  }
+                  var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  document.documentElement.classList.toggle('dark', prefersDark);
+                } catch (e) {
+                  console.error('Theme init failed:', e);
+                }
+              })();
+            `,
+          }}
+        />
         <AuthProvider>
           <Header />
           <main className="max-w-4xl mx-auto p-6">
