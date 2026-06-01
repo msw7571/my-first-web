@@ -56,16 +56,16 @@ export default function DarkModeToggle() {
       variant="outline"
       size="sm"
       onClick={toggleTheme}
-      className="flex items-center gap-2"
+      className="flex items-center gap-2 text-slate-800 dark:text-white"
     >
       {theme === "dark" ? (
         <>
-          <Moon className="h-4 w-4" />
+          <Moon className="h-4 w-4 text-slate-800 dark:text-white" />
           <span>다크</span>
         </>
       ) : (
         <>
-          <Sun className="h-4 w-4" />
+          <Sun className="h-4 w-4 text-slate-800 dark:text-white" />
           <span>라이트</span>
         </>
       )}
