@@ -1,10 +1,27 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const getSupabaseUrl = () => {
+  return process.env.NEXT_PUBLIC_SUPABASE_URL;
+};
 
-if (!supabaseUrl || !supabaseKey) {
-  console.warn('Supabase URL or Anon Key is missing. Please set them in .env.local');
-}
+const getSupabaseKey = () => {
+  return process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+};
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+const ensureSupabaseEnv = () => {
+  const supabaseUrl = getSupabaseUrl();
+  const supabaseKey = getSupabaseKey();
+
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error(
+      'Supabase environment variables are required. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.'
+    );
+  }
+
+  return { supabaseUrl, supabaseKey };
+};
+
+export const getSupabaseClient = (): SupabaseClient => {
+  const { supabaseUrl, supabaseKey } = ensureSupabaseEnv();
+  return createClient(supabaseUrl, supabaseKey);
+};

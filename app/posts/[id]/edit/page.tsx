@@ -1,10 +1,11 @@
-import { supabase } from "@/lib/supabase";
+import { getSupabaseClient } from "@/lib/supabase";
 import { notFound } from "next/navigation";
 import PostForm from "@/components/PostForm";
 import { Post } from "@/lib/posts";
 
 export default async function EditPostPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const supabase = getSupabaseClient();
 
   const { data: post, error } = await supabase
     .from("posts")

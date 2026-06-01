@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Post } from "@/lib/posts";
+import { getSupabaseClient } from "@/lib/supabase";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import PostActionButtons from "@/components/PostActionButtons";
@@ -10,9 +11,8 @@ interface PostPageProps {
   params: Promise<{ id: string }>;
 }
 
-import { supabase } from "@/lib/supabase";
-
 async function getPost(id: string): Promise<Post> {
+  const supabase = getSupabaseClient();
   const { data, error } = await supabase
     .from("posts")
     .select("*")
