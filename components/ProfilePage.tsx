@@ -49,7 +49,7 @@ export default function ProfilePage() {
 
         setUser({
           id: currentUser.id,
-          email: currentUser.email,
+          email: currentUser.email ?? null,
           created_at: currentUser.created_at ?? null,
         });
       } catch (error: any) {

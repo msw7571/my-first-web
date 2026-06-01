@@ -53,7 +53,7 @@ export default function CommentsSection({ postId }: CommentsSectionProps) {
       setErrorMessage("");
 
       const { data, error } = await supabase
-        .from<CommentItem>("comments")
+        .from("comments")
         .select("id, post_id, user_id, content, created_at")
         .eq("post_id", postId)
         .order("created_at", { ascending: true });
@@ -92,7 +92,7 @@ export default function CommentsSection({ postId }: CommentsSectionProps) {
 
     try {
       const { data, error } = await supabase
-        .from<CommentItem>("comments")
+        .from("comments")
         .insert([
           {
             post_id: postId,
