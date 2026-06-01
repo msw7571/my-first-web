@@ -61,20 +61,26 @@ export default function PostForm({ initialData }: PostFormProps) {
           .eq("id", initialData.id)
           .eq("user_id", user.id);
 
-        if (error) throw error;
-        router.push(`/posts/${initialData.id}`);
-      } else {
-        const { data, error } = await supabase
-          .from("posts")
-          .insert([{ title, content, user_id: user.id }])
-          .select()
-          .single();
+        if (error) {
+          throw error;
+        }
 
-        if (error) throw error;
-        router.push(data ? `/posts/${data.id}` : "/posts");
+        await router.push(`/posts/${initialData.id}`);
+        return;
       }
 
-      router.refresh();
+      const { data, error } = await supabase
+        .from("posts")
+        .insert([{ title, content, user_id: user.id }])
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      const destination = data?.id ? `/posts/${data.id}` : "/posts";
+      await router.push(destination);
     } catch (error: any) {
       console.error("Error saving post:", error);
       setFormError(error?.message || "게시글 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.");
