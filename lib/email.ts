@@ -4,12 +4,12 @@ function getSmtpConfig() {
   const host = process.env.SMTP_HOST;
   const port = Number(process.env.SMTP_PORT ?? "587");
   const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
+  const pass = process.env.SMTP_PASSWORD;
   const from = process.env.SMTP_FROM ?? "no-reply@example.com";
 
   if (!host || !user || !pass) {
     throw new Error(
-      "SMTP 환경 변수가 설정되어 있지 않습니다. SMTP_HOST, SMTP_USER, SMTP_PASS를 확인해주세요."
+      "SMTP 환경 변수가 설정되어 있지 않습니다. SMTP_HOST, SMTP_USER, SMTP_PASSWORD를 확인해주세요."
     );
   }
 
