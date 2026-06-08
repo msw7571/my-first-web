@@ -13,7 +13,7 @@ interface PostFormProps {
 }
 
 export default function PostForm({ initialData }: PostFormProps) {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState(initialData?.title || "");
@@ -21,6 +21,7 @@ export default function PostForm({ initialData }: PostFormProps) {
   const [titleError, setTitleError] = useState("");
   const [contentError, setContentError] = useState("");
   const [formError, setFormError] = useState("");
+  const isSubmitting = loading || authLoading;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,9 +29,15 @@ export default function PostForm({ initialData }: PostFormProps) {
     setContentError("");
     setFormError("");
 
+    if (authLoading) {
+      setFormError("로그인 정보를 확인 중입니다. 잠시만 기다려주세요.");
+      return;
+    }
+
     if (!user) {
       setFormError("로그인이 필요합니다.");
       router.push("/login");
+      setLoading(false);
       return;
     }
 
@@ -135,15 +142,15 @@ export default function PostForm({ initialData }: PostFormProps) {
           type="button"
           variant="outline"
           onClick={() => router.back()}
-          disabled={loading}
+          disabled={isSubmitting}
         >
           취소
         </Button>
         <Button
           type="submit"
-          disabled={loading}
+          disabled={isSubmitting}
         >
-          {loading ? "저장 중..." : (initialData ? "수정 완료" : "작성 완료")}
+          {isSubmitting ? "저장 중..." : (initialData ? "수정 완료" : "작성 완료")}
         </Button>
       </div>
     </form>
