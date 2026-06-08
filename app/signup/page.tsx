@@ -31,10 +31,14 @@ export default function SignupPage() {
         console.error("Signup error:", error);
         setErrorMsg(getErrorMessage(error));
       } else {
-        setSuccessMsg("가입이 완료되었습니다. 잠시 후 로그인 화면으로 이동합니다.");
+        setSuccessMsg(
+          "가입이 완료되었습니다.\n\n이메일 주소로 확인 메일이 발송되었습니다.\n" +
+          "이메일을 확인한 후 로그인해주세요.\n\n" +
+          "(이메일을 받지 못하셨다면 스팸 폴더를 확인해주세요.)"
+        );
         setTimeout(() => {
           router.push("/login");
-        }, 2000);
+        }, 3000);
       }
     } catch (err: any) {
       console.error("Signup exception:", err);
@@ -97,7 +101,9 @@ export default function SignupPage() {
               <p className="text-sm text-destructive font-medium">{errorMsg}</p>
             )}
             {successMsg && (
-              <p className="text-sm text-green-600 font-medium">{successMsg}</p>
+              <div className="text-sm text-green-600 font-medium whitespace-pre-wrap bg-green-50 p-3 rounded-lg border border-green-200">
+                {successMsg}
+              </div>
             )}
 
             <Button type="submit" className="w-full" disabled={loading}>

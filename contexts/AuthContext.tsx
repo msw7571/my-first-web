@@ -36,13 +36,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .maybeSingle();
 
           if (!profile) {
-            await supabase.from("profiles").insert([
+            // Use upsert to avoid duplicate key errors
+            await supabase.from("profiles").upsert([
               {
                 id: user.id,
                 username: user.user_metadata?.name || user.email?.split("@")[0] || "사용자",
                 role: "user"
               }
-            ]);
+            ], { onConflict: "id" });
           }
         }
       } catch (error) {
@@ -71,13 +72,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .maybeSingle();
 
         if (!profile) {
-          await supabase.from("profiles").insert([
+          // Use upsert to avoid duplicate key errors
+          await supabase.from("profiles").upsert([
             {
               id: currentUser.id,
               username: currentUser.user_metadata?.name || currentUser.email?.split("@")[0] || "사용자",
               role: "user"
             }
-          ]);
+          ], { onConflict: "id" });
         }
       }
     });
