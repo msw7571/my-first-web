@@ -59,7 +59,7 @@ export async function POST(request: Request) {
   } catch (err: any) {
     console.error("send-code error:", err);
     return NextResponse.json(
-      { error: "인증번호 전송 중 오류가 발생했습니다." },
+      { error: err?.message || "인증번호 전송 중 오류가 발생했습니다." },
       { status: 500 }
     );
   }
