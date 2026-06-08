@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -72,7 +72,7 @@ export default function SignupPage() {
         return;
       }
 
-      setSuccessMessage("회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.");
+      setSuccessMessage("이메일 인증에 성공했습니다. 로그인 페이지로 이동합니다.");
       setTimeout(() => router.push("/login"), 2000);
     } catch (error) {
       console.error("Verify code error:", error);
@@ -162,7 +162,7 @@ export default function SignupPage() {
             )}
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "처리 중..." : step === "request" ? "인증번호 받기" : "가입 완료"}
+              {loading ? "처리 중..." : step === "request" ? "인증번호 받기" : "인증 완료"}
             </Button>
 
             {step === "verify" && (
@@ -173,10 +173,7 @@ export default function SignupPage() {
           </form>
 
           <div className="text-center text-sm text-muted-foreground mt-4">
-            이미 계정이 있으신가요? {" "}
-            <Link href="/login" className="text-primary hover:underline">
-              로그인
-            </Link>
+            이미 계정이 있으신가요? <Link href="/login" className="text-primary hover:underline">로그인</Link>
           </div>
         </CardContent>
       </Card>

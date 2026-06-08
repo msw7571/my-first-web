@@ -1,23 +1,24 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
 
-export default function EmailOtpSignupPage() {
+export default function SignupPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
-  const [mode, setMode] = useState<"request" | "verify">("request");
+  const [step, setStep] = useState<"request" | "verify">("request");
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  const requestVerificationCode = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleRequestCode = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setErrorMessage("");
     setSuccessMessage("");
@@ -39,16 +40,17 @@ export default function EmailOtpSignupPage() {
         return;
       }
 
-      setSuccessMessage("인증번호가 이메일로 발송되었습니다. 이메일을 확인해주세요.");
-      setMode("verify");
-    } catch (err) {
+      setStep("verify");
+      setSuccessMessage("이메일로 6자리 인증번호를 발송했습니다. 이메일을 확인해주세요.");
+    } catch (error) {
+      console.error("Request code error:", error);
       setErrorMessage("인증번호 요청 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
   };
 
-  const verifyCodeAndSignUp = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleVerifyCode = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setErrorMessage("");
     setSuccessMessage("");
@@ -70,9 +72,10 @@ export default function EmailOtpSignupPage() {
         return;
       }
 
-      setSuccessMessage("회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.");
-      setTimeout(() => router.push("/login"), 2500);
-    } catch (err) {
+      setSuccessMessage("이메일 인증에 성공했습니다. 로그인 페이지로 이동합니다.");
+      setTimeout(() => router.push("/login"), 2000);
+    } catch (error) {
+      console.error("Verify code error:", error);
       setErrorMessage("인증번호 확인 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
@@ -86,7 +89,7 @@ export default function EmailOtpSignupPage() {
           <CardTitle className="text-2xl text-center">이메일 회원가입</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={mode === "request" ? requestVerificationCode : verifyCodeAndSignUp} className="space-y-4">
+          <form onSubmit={step === "request" ? handleRequestCode : handleVerifyCode} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="name" className="text-sm font-medium">
                 이름
@@ -98,9 +101,10 @@ export default function EmailOtpSignupPage() {
                 onChange={(e) => setName(e.target.value)}
                 placeholder="홍길동"
                 required
-                disabled={mode === "verify"}
+                disabled={step === "verify"}
               />
             </div>
+
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium">
                 이메일
@@ -112,9 +116,10 @@ export default function EmailOtpSignupPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
                 required
-                disabled={mode === "verify"}
+                disabled={step === "verify"}
               />
             </div>
+
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm font-medium">
                 비밀번호
@@ -127,11 +132,11 @@ export default function EmailOtpSignupPage() {
                 placeholder="6자리 이상 입력해주세요"
                 required
                 minLength={6}
-                disabled={mode === "verify"}
+                disabled={step === "verify"}
               />
             </div>
 
-            {mode === "verify" && (
+            {step === "verify" && (
               <div className="space-y-2">
                 <label htmlFor="code" className="text-sm font-medium">
                   6자리 인증번호
@@ -157,19 +162,19 @@ export default function EmailOtpSignupPage() {
             )}
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading
-                ? "처리 중..."
-                : mode === "request"
-                ? "인증번호 받기"
-                : "가입 완료"}
+              {loading ? "처리 중..." : step === "request" ? "인증번호 받기" : "인증 완료"}
             </Button>
 
-            {mode === "verify" && (
+            {step === "verify" && (
               <p className="text-sm text-muted-foreground">
-                이메일로 받은 6자리 인증번호를 입력하고 가입을 완료하세요.
+                이메일로 전송된 인증번호를 입력해주세요.
               </p>
             )}
           </form>
+
+          <div className="text-center text-sm text-muted-foreground mt-4">
+            이미 계정이 있으신가요? <Link href="/login" className="text-primary hover:underline">로그인</Link>
+          </div>
         </CardContent>
       </Card>
     </div>

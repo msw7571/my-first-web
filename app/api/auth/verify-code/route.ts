@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
     if (verificationError || !verification) {
       return NextResponse.json(
-        { error: "유효하지 않은 인증번호입니다. 다시 시도해주세요." },
+        { error: "인증번호가 틀렸습니다. 다시 확인해주세요." },
         { status: 400 }
       );
     }
