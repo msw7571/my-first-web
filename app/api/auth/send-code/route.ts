@@ -53,9 +53,29 @@ export async function POST(request: Request) {
       );
     }
 
-    await sendVerificationEmail(email, code);
+    try {
+      await sendVerificationEmail(email, code);
+      return NextResponse.json({ ok: true });
+    } catch (err) {
+      console.error("sendVerificationEmail error:", err);
 
-    return NextResponse.json({ ok: true });
+      // 개발 환경에서만 안전 장치로 디버그 코드를 반환합니다.
+      // 동작 조건: NODE_ENV === 'development' 그리고 DEV_AUTH_DEBUG === 'true'
+      if (
+        process.env.NODE_ENV === "development" &&
+        String(process.env.DEV_AUTH_DEBUG).toLowerCase() === "true"
+      ) {
+        console.warn(
+          "Development fallback: returning verification code in response (DEV_AUTH_DEBUG enabled)."
+        );
+        return NextResponse.json({ ok: true, debugCode: code });
+      }
+
+      return NextResponse.json(
+        { error: "인증번호 전송 중 오류가 발생했습니다." },
+        { status: 500 }
+      );
+    }
   } catch (err: any) {
     console.error("send-code error:", err);
     return NextResponse.json(

@@ -40,7 +40,11 @@ export default function SignupPage() {
         return;
       }
 
-      setSuccessMessage("인증번호를 발송했습니다. 이메일을 확인해주세요.");
+      if (result?.debugCode) {
+        setSuccessMessage(`인증번호를 발송했습니다. (개발용 코드: ${result.debugCode})`);
+      } else {
+        setSuccessMessage("인증번호를 발송했습니다. 이메일을 확인해주세요.");
+      }
       setStep("verify");
     } catch (error) {
       console.error("Send code error:", error);
