@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
+import { signUpWithEmail } from "@/lib/auth";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -21,16 +22,10 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-      });
+      const result = await signUpWithEmail(email, password, name);
 
-      const result = await res.json();
-
-      if (!res.ok) {
-        setErrorMessage(result?.error || "회원가입에 실패했습니다.");
+      if (result.error) {
+        setErrorMessage(result.error.message || "회원가입에 실패했습니다.");
         return;
       }
 
