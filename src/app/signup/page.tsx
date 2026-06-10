@@ -28,8 +28,22 @@ export default function Page() {
         return;
       }
 
-      alert("회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.");
-      router.push("/login");
+      // 가입 성공 시 자동으로 로그인 시도
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) {
+        // 자동 로그인 실패하면 로그인 페이지로 이동
+        console.warn("자동 로그인 실패:", signInError.message);
+        alert("회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.");
+        router.push("/login");
+        return;
+      }
+
+      // 자동 로그인 성공
+      router.push("/");
     } catch (err) {
       console.error(err);
       setError("회원가입 중 오류가 발생했습니다.");

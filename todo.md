@@ -23,7 +23,7 @@
 
 - [x] RLS (Row Level Security) 설정으로 실제 데이터 보호 (Ch11)
   - [x] Supabase CLI 마이그레이션 파일 생성 (`supabase/migrations/20260520050330_add_posts_rls.sql`)
-  - [ ] `profiles` 테이블 RLS 활성화 및 정책 정의 (SELECT: 전체 공개 / INSERT, UPDATE: auth.uid() = id 인 본인 레코드만)
+  - [x] `profiles` 테이블 RLS 활성화 및 정책 정의 (SELECT: 전체 공개 / INSERT, UPDATE: auth.uid() = id 인 본인 레코드만)
   - [x] `posts` 테이블 RLS 활성화 및 정책 정의 (SELECT: 전체 공개 / INSERT: 인증 유저 && user_id = auth.uid() / UPDATE: auth.uid() = user_id / DELETE: auth.uid() = user_id)
   - [x] db push 적용 및 빌드 검증
   - [x] 다른 계정 우회 테스트
